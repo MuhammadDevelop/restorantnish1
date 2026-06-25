@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: bella-vista-restaurant
+    env: node
+    region: frankfurt
+    plan: free
+    rootDir: restaurant-cafe
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20
