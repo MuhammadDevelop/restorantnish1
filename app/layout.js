@@ -1,4 +1,5 @@
 import './globals.css';
+import { LanguageProvider } from './context/LanguageContext';
 
 export const metadata = {
   title: 'Bella Vista — Fine Dining Restaurant',
@@ -8,8 +9,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="uz">
+      <body>
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
+      </body>
     </html>
   );
 }

@@ -1,10 +1,19 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { useLang } from '../context/LanguageContext';
 import styles from './Navbar.module.css';
 
+const LANGS = [
+  { code: 'uz', label: "O'Z", flag: '🇺🇿' },
+  { code: 'ru', label: 'RU', flag: '🇷🇺' },
+  { code: 'en', label: 'EN', flag: '🇬🇧' },
+];
+
 export default function Navbar() {
+  const { lang, setLang, t } = useLang();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -13,12 +22,14 @@ export default function Navbar() {
   }, []);
 
   const links = [
-    { href: '#home', label: 'Home' },
-    { href: '#menu', label: 'Menu' },
-    { href: '#about', label: 'About' },
-    { href: '#reviews', label: 'Reviews' },
-    { href: '#contact', label: 'Contact' },
+    { href: '#home',    label: t('nav_home')    },
+    { href: '#menu',    label: t('nav_menu')    },
+    { href: '#about',   label: t('nav_about')   },
+    { href: '#reviews', label: t('nav_reviews') },
+    { href: '#contact', label: t('nav_contact') },
   ];
+
+  const currentLang = LANGS.find(l => l.code === lang);
 
   return (
     <nav className={`${styles.navbar} ${scrolled ? styles.scrolled : ''}`}>
@@ -41,23 +52,54 @@ export default function Navbar() {
           ))}
           <li>
             <a href="/dashboard" className={styles.dashBtn} id="nav-dashboard">
-              Dashboard
+              {t('nav_dashboard')}
             </a>
           </li>
           <li>
             <a href="#reservation" className={styles.reserveBtn} onClick={() => setMenuOpen(false)}>
-              Reserve a Table
+              {t('nav_reserve')}
             </a>
           </li>
         </ul>
 
-        <button
-          className={`${styles.burger} ${menuOpen ? styles.burgerOpen : ''}`}
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-        >
-          <span /><span /><span />
-        </button>
+        <div className={styles.right}>
+          {/* Language switcher */}
+          <div className={styles.langSwitch}>
+            <button
+              className={styles.langCurrent}
+              onClick={() => setLangOpen(!langOpen)}
+              id="lang-switcher"
+              aria-label="Change language"
+            >
+              <span>{currentLang.flag}</span>
+              <span>{currentLang.label}</span>
+              <span className={`${styles.langArrow} ${langOpen ? styles.langArrowOpen : ''}`}>▾</span>
+            </button>
+            {langOpen && (
+              <div className={styles.langDropdown}>
+                {LANGS.map(l => (
+                  <button
+                    key={l.code}
+                    className={`${styles.langOption} ${lang === l.code ? styles.langActive : ''}`}
+                    onClick={() => { setLang(l.code); setLangOpen(false); }}
+                    id={`lang-${l.code}`}
+                  >
+                    <span>{l.flag}</span>
+                    <span>{l.label}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <button
+            className={`${styles.burger} ${menuOpen ? styles.burgerOpen : ''}`}
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle menu"
+          >
+            <span /><span /><span />
+          </button>
+        </div>
       </div>
     </nav>
   );
