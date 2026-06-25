@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
+
 
 const ADMIN_CODE = 'ADMIN2025';
 
@@ -161,9 +161,8 @@ function AdminDashboard({ onLogout }) {
 
 // ─── Login Page ───────────────────────────────────────────────────────────────
 export default function Dashboard() {
-  const router = useRouter();
-  const [form, setForm]     = useState({ name: '', phone: '', code: '' });
-  const [error, setError]   = useState('');
+  const [form, setForm]       = useState({ name: '', phone: '', code: '' });
+  const [error, setError]     = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
 
@@ -175,14 +174,12 @@ export default function Dashboard() {
   const submit = (e) => {
     e.preventDefault();
     if (form.code.trim() === ADMIN_CODE) {
-      // Admin kirish
       setIsAdmin(true);
       setLoggedIn(true);
     } else if (form.name.trim() && form.phone.trim()) {
-      // Oddiy foydalanuvchi → saytga yo'naltirish
-      router.push('/');
+      window.location.href = '/';
     } else {
-      setError("Ism va telefon raqamingizni kiriting yoki maxsus kod bilan kiring.");
+      setError('Ism va telefon raqamingizni kiriting yoki maxsus kod bilan kiring.');
     }
   };
 
