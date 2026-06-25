@@ -51,7 +51,12 @@ export default function Navbar() {
             </li>
           ))}
           <li>
-            <a href="/dashboard" className={styles.dashBtn} id="nav-dashboard">
+            <a href="/delivery" className={styles.deliveryBtn} id="nav-delivery">
+              🛵 {t('nav_home') === 'Home' ? 'Delivery' : t('nav_home') === 'Bosh sahifa' ? 'Yetkazib berish' : 'Доставка'}
+            </a>
+          </li>
+          <li>
+            <a href="/admin" className={styles.dashBtn} id="nav-dashboard">
               {t('nav_dashboard')}
             </a>
           </li>
