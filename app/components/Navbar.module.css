@@ -112,23 +112,24 @@
 .dashBtn {
   display: inline-flex;
   align-items: center;
-  background: rgba(139, 92, 246, 0.1);
-  color: #a78bfa;
+  background: rgba(201,168,76,0.08);
+  color: var(--gold);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
   padding: 10px 20px;
   border-radius: 6px;
-  border: 1px solid rgba(139, 92, 246, 0.35);
+  border: 1px solid rgba(201,168,76,0.35);
   transition: all 0.3s ease;
 }
 
 .dashBtn:hover {
-  background: rgba(139, 92, 246, 0.2);
-  border-color: #a78bfa;
-  color: #c4b5fd;
+  background: rgba(201,168,76,0.18);
+  border-color: var(--gold);
+  color: var(--gold-light);
   transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(201,168,76,0.2);
 }
 
 .burger {
@@ -159,9 +160,9 @@
 }
 
 .deliveryBtn {
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.35);
-  color: #10b981;
+  background: rgba(201,168,76,0.08);
+  border: 1px solid rgba(201,168,76,0.35);
+  color: var(--gold);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 1px;
@@ -174,11 +175,11 @@
   gap: 6px;
 }
 .deliveryBtn:hover {
-  background: rgba(16, 185, 129, 0.2);
-  border-color: #10b981;
-  color: #34d399;
+  background: rgba(201,168,76,0.18);
+  border-color: var(--gold);
+  color: var(--gold-light);
   transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+  box-shadow: 0 4px 15px rgba(201,168,76,0.2);
 }
 
 @media (max-width: 768px) {
