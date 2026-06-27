@@ -170,9 +170,9 @@ export default function DeliveryPage() {
           <h1>Uyingizga yetkazamiz</h1>
           <p>Bella Vista taomlarini 35–45 daqiqada eshigingizgacha</p>
           <div className={styles.heroBadges}>
-            <span>⏱ 35–45 daqiqa</span>
-            <span>🚚 $5 yetkazib berish</span>
-            <span>💳 Online to'lov</span>
+            <button onClick={() => document.querySelector('.'+styles.menuSection)?.scrollIntoView({behavior:'smooth'})} className={styles.heroBadgeBtn}>⏱ 35–45 daqiqa</button>
+            <button onClick={() => document.querySelector('.'+styles.menuSection)?.scrollIntoView({behavior:'smooth'})} className={styles.heroBadgeBtn}>🚚 $5 yetkazib berish</button>
+            <button onClick={() => document.querySelector('.'+styles.menuSection)?.scrollIntoView({behavior:'smooth'})} className={styles.heroBadgeBtn}>💳 Online to'lov</button>
           </div>
         </div>
       </div>

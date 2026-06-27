@@ -99,15 +99,28 @@
   flex-wrap: wrap;
 }
 
-.heroBadges span {
+.heroBadgeBtn {
   background: rgba(201,168,76,0.08);
   border: 1px solid var(--border-gold);
   color: var(--gold);
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
   font-weight: 600;
-  padding: 8px 18px;
+  padding: 10px 20px;
   border-radius: 50px;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
+.heroBadgeBtn:hover {
+  background: rgba(201,168,76,0.18);
+  border-color: var(--gold);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(201,168,76,0.15);
+}
+
 
 /* ── Menu section ── */
 .menuSection {
