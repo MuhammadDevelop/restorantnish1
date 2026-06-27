@@ -28,10 +28,13 @@ export default function HeroClient() {
         </h1>
         <p className={styles.subtitle}>{t('hero_subtitle')}</p>
         <div className={styles.actions}>
-          <a href="#reservation" className="btn-primary">
+          <a href="#reservation" className="btn-primary" id="hero-reserve-btn">
             <span>{t('hero_reserve')}</span>
           </a>
-          <a href="#menu" className="btn-outline">
+          <a href="/delivery" className={styles.deliveryBtn} id="hero-delivery-btn">
+            🛵 {t('nav_home') === 'Home' ? 'Order Delivery' : t('nav_home') === 'Bosh sahifa' ? 'Yetkazib berish' : 'Доставка'}
+          </a>
+          <a href="#menu" className="btn-outline" id="hero-menu-btn">
             {t('hero_menu')}
           </a>
         </div>

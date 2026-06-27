@@ -35,9 +35,22 @@ function OrderModal({ dish, onClose, t }) {
           <p className={styles.modalDesc}>{dish.desc_key}</p>
           <div className={styles.modalFooter}>
             <span className={styles.modalPrice}>{dish.price}</span>
-            <button className={styles.modalBtn} onClick={handleReserve} id={`modal-order-${dish.id}`}>
-              {t('modal_reserve')}
-            </button>
+            <div className={styles.modalActions}>
+              <a
+                href="/delivery"
+                className={styles.modalBtnGreen}
+                id={`modal-delivery-${dish.id}`}
+              >
+                🛵 {t('nav_home') === 'Home' ? 'Order Delivery' : t('nav_home') === 'Bosh sahifa' ? 'Yetkazib olish' : 'Доставка'}
+              </a>
+              <button
+                className={styles.modalBtn}
+                onClick={handleReserve}
+                id={`modal-order-${dish.id}`}
+              >
+                🍽️ {t('nav_home') === 'Home' ? 'Book a Table' : t('nav_home') === 'Bosh sahifa' ? 'Stol band qilish' : 'Забронировать'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
