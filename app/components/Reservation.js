@@ -1,24 +1,44 @@
 'use client';
 import { useState } from 'react';
 import { useLang } from '../context/LanguageContext';
+import { addOrder } from '../lib/orderStore';
 import styles from './Reservation.module.css';
 
 export default function Reservation() {
   const { t } = useLang();
-  const [form, setForm] = useState({ name: '', email: '', phone: '', date: '', time: '', guests: '2', message: '' });
+  const [form, setForm]         = useState({ name:'', email:'', phone:'', date:'', time:'', guests:'2', message:'' });
   const [submitted, setSubmitted] = useState(false);
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-  const handleSubmit = (e) => { e.preventDefault(); setSubmitted(true); };
+  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleSubmit = e => {
+    e.preventDefault();
+    // Save reservation to shared store → appears in admin panel
+    addOrder({
+      type:     'table',
+      customer: form.name,
+      phone:    form.phone,
+      email:    form.email,
+      address:  `${form.date} soat ${form.time}`,
+      items:    `Stol bron — ${form.guests} kishi`,
+      itemsArr: [{ name: 'Stol bron qilish', qty: parseInt(form.guests), price: 0 }],
+      guests:   form.guests,
+      date:     form.date,
+      resTime:  form.time,
+      note:     form.message,
+      subtotal: 0,
+      delivery: 0,
+      total:    0,
+    });
+    setSubmitted(true);
+  };
 
   return (
     <section id="reservation" className={styles.section}>
       <div className={styles.inner}>
         <div className={styles.info}>
           <span className="section-label">{t('res_label')}</span>
-          <h2 className="section-title">
-            {t('res_title1')}<br />{t('res_title2')}
-          </h2>
+          <h2 className="section-title">{t('res_title1')}<br />{t('res_title2')}</h2>
           <div className="divider" />
           <p className={styles.desc}>{t('res_desc')}</p>
 

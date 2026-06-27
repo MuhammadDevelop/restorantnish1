@@ -9,15 +9,23 @@ const LANGS = [
   { code: 'en', label: 'EN', flag: '🇬🇧' },
 ];
 
-export default function Navbar() {
+export default function Navbar({ onLogout }) {
   const { lang, setLang, t } = useLang();
-  const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [langOpen, setLangOpen] = useState(false);
+  const [scrolled,  setScrolled]  = useState(false);
+  const [menuOpen,  setMenuOpen]  = useState(false);
+  const [langOpen,  setLangOpen]  = useState(false);
+  const [userName,  setUserName]  = useState('');
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener('scroll', onScroll);
+
+    // Get logged-in user name
+    const saved = localStorage.getItem('bv_user');
+    if (saved) {
+      try { setUserName(JSON.parse(saved).name.split(' ')[0]); } catch {}
+    }
+
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
@@ -30,6 +38,11 @@ export default function Navbar() {
   ];
 
   const currentLang = LANGS.find(l => l.code === lang);
+
+  const handleLogout = () => {
+    localStorage.removeItem('bv_user');
+    if (onLogout) onLogout();
+  };
 
   return (
     <nav className={`${styles.navbar} ${scrolled ? styles.scrolled : ''}`}>
@@ -53,11 +66,6 @@ export default function Navbar() {
           <li>
             <a href="/delivery" className={styles.deliveryBtn} id="nav-delivery">
               🛵 {t('nav_home') === 'Home' ? 'Delivery' : t('nav_home') === 'Bosh sahifa' ? 'Yetkazib berish' : 'Доставка'}
-            </a>
-          </li>
-          <li>
-            <a href="/admin" className={styles.dashBtn} id="nav-dashboard">
-              {t('nav_dashboard')}
             </a>
           </li>
           <li>
@@ -96,6 +104,16 @@ export default function Navbar() {
               </div>
             )}
           </div>
+
+          {/* User + logout */}
+          {userName && (
+            <div className={styles.userArea}>
+              <span className={styles.userName}>👤 {userName}</span>
+              <button className={styles.logoutBtn} onClick={handleLogout} id="logout-btn" title="Chiqish">
+                ⏏
+              </button>
+            </div>
+          )}
 
           <button
             className={`${styles.burger} ${menuOpen ? styles.burgerOpen : ''}`}

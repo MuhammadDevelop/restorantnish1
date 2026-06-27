@@ -1,0 +1,238 @@
+.loader {
+  min-height: 100vh;
+  background: var(--dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loaderIcon {
+  font-size: 36px;
+  color: var(--gold);
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  0%   { transform: rotate(0deg) scale(1); opacity: 1; }
+  50%  { transform: rotate(180deg) scale(1.3); opacity: 0.6; }
+  100% { transform: rotate(360deg) scale(1); opacity: 1; }
+}
+
+/* ── Login page ─────────────────────────────── */
+.loginPage {
+  min-height: 100vh;
+  background: var(--dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.glow1 {
+  position: absolute;
+  top: -200px;
+  left: -200px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(201,168,76,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.glow2 {
+  position: absolute;
+  bottom: -200px;
+  right: -200px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(201,168,76,0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.loginWrap {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  animation: fadeInUp 0.6s ease both;
+}
+
+/* Logo */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logoIcon {
+  font-size: 34px;
+  color: var(--gold);
+}
+
+.logo strong {
+  display: block;
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.logo span {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-top: 4px;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  background: var(--dark-3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 4px;
+  width: 100%;
+  gap: 4px;
+}
+
+.tab {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.tab:hover { color: var(--text-secondary); }
+
+.tabActive {
+  background: rgba(201,168,76,0.12) !important;
+  color: var(--gold) !important;
+  border: 1px solid var(--border-gold) !important;
+}
+
+/* Card */
+.card {
+  width: 100%;
+  background: var(--dark-3);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.cardTop {
+  background: linear-gradient(135deg, var(--dark-4), var(--dark-3));
+  border-bottom: 1px solid var(--border);
+  padding: 28px 36px 24px;
+  text-align: center;
+}
+
+.cardTop h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.cardTop p {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Form */
+.form {
+  padding: 28px 36px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.field input {
+  background: var(--dark-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  padding: 13px 16px;
+  outline: none;
+  transition: var(--transition-fast);
+}
+.field input::placeholder { color: var(--text-faint); }
+.field input:focus {
+  border-color: var(--border-gold2);
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.07);
+}
+
+.error {
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.2);
+  border-radius: var(--radius-sm);
+  color: var(--red);
+  font-size: 13px;
+  padding: 10px 14px;
+  line-height: 1.5;
+}
+
+.submitBtn {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  color: var(--dark);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: var(--transition);
+}
+.submitBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 36px rgba(201,168,76,0.3);
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+}
+
+/* Hint */
+.hint {
+  font-size: 12px;
+  color: var(--text-faint);
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 480px) {
+  .form    { padding: 24px; }
+  .cardTop { padding: 22px 24px 18px; }
+}

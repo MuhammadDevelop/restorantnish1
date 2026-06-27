@@ -1,358 +1,352 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { getOrders, updateOrderStatus, deleteOrder, formatTime, formatDate, STATUS_CONFIG } from '../lib/orderStore';
 import styles from './page.module.css';
 
 const ADMIN_CODE = 'ADMIN2025';
 
-// ── Fake data ────────────────────────────────────────────────────────────────
-const initialOrders = [
-  { id: 5821, customer: 'Ali Karimov',    phone: '+998901234567', items: 'Truffle Carbonara ×2, Lobster Bisque ×1', total: 104, status: 'new',      time: '10:32', type: 'delivery', address: 'Chilonzor 14-uy' },
-  { id: 5820, customer: 'Kamol Toshev',   phone: '+998911112233', items: 'Glazed Salmon ×1, Crème Brûlée ×2',       total:  76, status: 'cooking',  time: '10:18', type: 'dine-in',  address: 'Stol №4' },
-  { id: 5819, customer: 'Nilufar Xasanova',phone:'+998931239876', items: 'Burrata & Prosciutto ×2',                 total:  44, status: 'ready',    time: '10:05', type: 'delivery', address: 'Yunusobod 22' },
-  { id: 5818, customer: 'Jasur Mirzayev', phone: '+998907654321', items: 'Lava Chocolate Cake ×3',                  total:  54, status: 'delivered',time: '09:48', type: 'delivery', address: 'Mirzo Ulugbek 7' },
-  { id: 5817, customer: 'Sarvinoz Raximova',phone:'+998951234567',items: 'Truffle Carbonara ×1, Glazed Salmon ×1',  total:  82, status: 'delivered',time: '09:30', type: 'dine-in',  address: 'Stol №2' },
-  { id: 5816, customer: 'Bobur Usmonov',  phone: '+998901112233', items: 'Lobster Bisque ×2, Crème Brûlée ×1',      total:  72, status: 'cancelled',time: '09:10', type: 'delivery', address: 'Shayxontohur 5' },
-];
-
-const menuItems = [
-  { id: 1, name: 'Truffle Carbonara',    category: 'Main',    price: 38, status: 'active',   sold: 142 },
-  { id: 2, name: 'Glazed Salmon',        category: 'Main',    price: 44, status: 'active',   sold: 98  },
-  { id: 3, name: 'Lava Chocolate Cake',  category: 'Dessert', price: 18, status: 'active',   sold: 210 },
-  { id: 4, name: 'Burrata & Prosciutto', category: 'Starter', price: 22, status: 'active',   sold: 76  },
-  { id: 5, name: 'Lobster Bisque',       category: 'Starter', price: 28, status: 'inactive', sold: 54  },
-  { id: 6, name: 'Crème Brûlée',         category: 'Dessert', price: 16, status: 'active',   sold: 189 },
-];
-
-const staff = [
-  { id: 1, name: 'Marco Rossi',     role: 'Bosh oshpaz',  status: 'online',  shifts: 'Du-Ju 09:00-18:00' },
-  { id: 2, name: 'Aziz Toshmatov',  role: 'Ofitsant',     status: 'online',  shifts: 'Du-Sha 11:00-22:00' },
-  { id: 3, name: 'Lola Yusupova',   role: 'Kassir',       status: 'online',  shifts: 'Du-Ju 10:00-20:00' },
-  { id: 4, name: 'Bekzod Nazarov',  role: 'Kuryer',       status: 'offline', shifts: 'Sha-Ya 12:00-22:00' },
-  { id: 5, name: 'Malika Hasanova', role: 'Administrator',status: 'online',  shifts: 'Du-Ju 09:00-18:00' },
-];
-
-const STATUS_CONFIG = {
-  new:       { label: "Yangi",         color: '#3b82f6', bg: 'rgba(59,130,246,0.12)' },
-  cooking:   { label: "Tayyorlanmoqda",color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
-  ready:     { label: "Tayyor",        color: '#10b981', bg: 'rgba(16,185,129,0.12)' },
-  delivered: { label: "Yetkazildi",   color: '#6b7280', bg: 'rgba(107,114,128,0.1)'  },
-  cancelled: { label: "Bekor",         color: '#ef4444', bg: 'rgba(239,68,68,0.1)'   },
-};
-
-const NEXT_STATUS = { new: 'cooking', cooking: 'ready', ready: 'delivered' };
-
-// ── Stat card ────────────────────────────────────────────────────────────────
-function StatCard({ icon, label, value, sub, color }) {
-  return (
-    <div className={styles.statCard} style={{ '--sc': color }}>
-      <div className={styles.statIcon}>{icon}</div>
-      <div>
-        <div className={styles.statValue}>{value}</div>
-        <div className={styles.statLabel}>{label}</div>
-        {sub && <div className={styles.statSub}>{sub}</div>}
-      </div>
-    </div>
-  );
-}
-
-// ── Login ────────────────────────────────────────────────────────────────────
+// ── Login ──────────────────────────────────────────────────────────────────
 function Login({ onLogin }) {
   const [code, setCode] = useState('');
   const [err,  setErr]  = useState(false);
-  const submit = (e) => {
+  const [shake, setShake] = useState(false);
+
+  const submit = e => {
     e.preventDefault();
-    if (code === ADMIN_CODE) onLogin();
-    else setErr(true);
+    if (code === ADMIN_CODE) { onLogin(); }
+    else {
+      setErr(true); setShake(true);
+      setTimeout(() => setShake(false), 500);
+    }
   };
+
   return (
     <div className={styles.loginPage}>
-      <div className={styles.loginCard}>
-        <div className={styles.loginIcon}>⚙️</div>
-        <h2>Admin Panel</h2>
-        <p>Kirish uchun maxsus kodni kiriting</p>
-        <form onSubmit={submit}>
+      <div className={styles.glow} />
+      <div className={`${styles.loginCard} ${shake ? styles.shake : ''}`}>
+        <div className={styles.loginLogo}>
+          <span className={styles.loginStar}>✦</span>
+          <div>
+            <strong>Bella Vista</strong>
+            <span>ADMIN PANEL</span>
+          </div>
+        </div>
+        <p className={styles.loginHint}>Kirish uchun maxsus kodni kiriting</p>
+        <form onSubmit={submit} className={styles.loginForm}>
           <input
             type="password"
-            placeholder="Admin kodi..."
+            placeholder="••••••••••"
             value={code}
             onChange={e => { setCode(e.target.value); setErr(false); }}
             className={err ? styles.inputErr : ''}
-            id="admin-code-input"
             autoFocus
+            id="admin-code-input"
           />
-          {err && <span className={styles.errMsg}>❌ Noto'g'ri kod</span>}
+          {err && <div className={styles.errMsg}>❌ Noto'g'ri kod. Qayta urinib ko'ring.</div>}
           <button type="submit" id="admin-login-btn">Kirish →</button>
         </form>
-        <a href="/" className={styles.loginBack}>← Saytga qaytish</a>
+        <a href="/" className={styles.loginBack}>← Asosiy saytga qaytish</a>
       </div>
     </div>
   );
 }
 
-// ── Main Admin Panel ─────────────────────────────────────────────────────────
+// ── Status Badge ───────────────────────────────────────────────────────────
+function StatusBadge({ status }) {
+  const s = STATUS_CONFIG[status] || STATUS_CONFIG.new;
+  return (
+    <span className={styles.badge} style={{ color: s.color, background: s.bg, borderColor: s.color + '44' }}>
+      {s.label}
+    </span>
+  );
+}
+
+// ── Order Card ─────────────────────────────────────────────────────────────
+function OrderCard({ order, onAdvance, onCancel, onDelete, isNew }) {
+  const s   = STATUS_CONFIG[order.status] || STATUS_CONFIG.new;
+  const isDelivery = order.type === 'delivery';
+  return (
+    <div className={`${styles.orderCard} ${isNew ? styles.orderNew : ''}`} id={`order-${order.id}`}>
+      <div className={styles.orderTop}>
+        <div className={styles.orderLeft}>
+          <span className={styles.orderType}>{isDelivery ? '🛵 Yetkazib berish' : '🍽️ Stol bron'}</span>
+          <span className={styles.orderId}>#{String(order.id).slice(-5)}</span>
+        </div>
+        <div className={styles.orderRight}>
+          <StatusBadge status={order.status} />
+          <span className={styles.orderTime}>{formatDate(order.createdAt)} · {formatTime(order.createdAt)}</span>
+        </div>
+      </div>
+
+      <div className={styles.orderMid}>
+        <div className={styles.orderCustomer}>
+          <strong>👤 {order.customer}</strong>
+          <span>📞 {order.phone}</span>
+          <span>📍 {order.address}</span>
+        </div>
+        <div className={styles.orderItems}>
+          <span className={styles.itemsLabel}>Buyurtma:</span>
+          <span>{order.items}</span>
+          {order.note && <span className={styles.orderNote}>💬 {order.note}</span>}
+        </div>
+      </div>
+
+      {order.total > 0 && (
+        <div className={styles.orderTotal}>
+          Jami: <strong>${order.total}</strong>
+        </div>
+      )}
+
+      <div className={styles.orderActions}>
+        {s.next && (
+          <button
+            className={styles.advBtn}
+            onClick={() => onAdvance(order.id, s.next)}
+            id={`advance-${order.id}`}
+          >
+            {s.nextLabel}
+          </button>
+        )}
+        {['new','cooking','table'].includes(order.status) && (
+          <button className={styles.cancelBtn} onClick={() => onCancel(order.id)} id={`cancel-${order.id}`}>
+            ✕ Bekor qilish
+          </button>
+        )}
+        {['delivered','cancelled'].includes(order.status) && (
+          <button className={styles.deleteBtn} onClick={() => onDelete(order.id)} id={`delete-${order.id}`}>
+            🗑 O'chirish
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Main Admin Panel ────────────────────────────────────────────────────────
 export default function AdminPage() {
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [tab, setTab]           = useState('dashboard');
-  const [orders, setOrders]     = useState(initialOrders);
-  const [filterStatus, setFilter] = useState('all');
+  const [loggedIn,  setLoggedIn]  = useState(false);
+  const [orders,    setOrders]    = useState([]);
+  const [tab,       setTab]       = useState('orders');  // orders | stats
+  const [filter,    setFilter]    = useState('all');
+  const [newIds,    setNewIds]    = useState(new Set());
+  const [notify,    setNotify]    = useState(false);
+
+  const loadOrders = useCallback(() => {
+    const fresh = getOrders();
+    setOrders(prev => {
+      // detect newly added orders
+      const prevIds = new Set(prev.map(o => o.id));
+      const added   = fresh.filter(o => !prevIds.has(o.id)).map(o => o.id);
+      if (added.length > 0) {
+        setNewIds(ids => new Set([...ids, ...added]));
+        setNotify(true);
+        setTimeout(() => setNotify(false), 3000);
+        // Auto clear new highlight after 5s
+        setTimeout(() => setNewIds(ids => {
+          const copy = new Set(ids);
+          added.forEach(id => copy.delete(id));
+          return copy;
+        }), 5000);
+      }
+      return fresh;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!loggedIn) return;
+    loadOrders();
+    // Poll every 5 seconds for new orders
+    const interval = setInterval(loadOrders, 5000);
+    // Also listen for same-tab events
+    window.addEventListener('bv_new_order', loadOrders);
+    window.addEventListener('storage', loadOrders);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('bv_new_order', loadOrders);
+      window.removeEventListener('storage', loadOrders);
+    };
+  }, [loggedIn, loadOrders]);
 
   if (!loggedIn) return <Login onLogin={() => setLoggedIn(true)} />;
 
-  const stats = {
-    today: orders.filter(o => o.status !== 'cancelled').reduce((s,o) => s + o.total, 0),
-    newOrders: orders.filter(o => o.status === 'new').length,
-    cooking: orders.filter(o => o.status === 'cooking').length,
-    delivered: orders.filter(o => o.status === 'delivered').length,
+  const advance = (id, nextStatus) => {
+    const updated = updateOrderStatus(id, nextStatus);
+    setOrders(updated);
   };
 
-  const filteredOrders = filterStatus === 'all' ? orders : orders.filter(o => o.status === filterStatus);
-
-  const advanceOrder = (id) => {
-    setOrders(prev => prev.map(o =>
-      o.id === id && NEXT_STATUS[o.status] ? { ...o, status: NEXT_STATUS[o.status] } : o
-    ));
+  const cancel = (id) => {
+    const updated = updateOrderStatus(id, 'cancelled');
+    setOrders(updated);
   };
 
-  const cancelOrder = (id) => {
-    setOrders(prev => prev.map(o => o.id === id ? { ...o, status: 'cancelled' } : o));
+  const remove = (id) => {
+    const updated = deleteOrder(id);
+    setOrders(updated);
   };
+
+  // Stats
+  const todayStr = new Date().toDateString();
+  const todayOrders   = orders.filter(o => new Date(o.createdAt).toDateString() === todayStr);
+  const pendingCount  = orders.filter(o => ['new','cooking','table'].includes(o.status)).length;
+  const todayRevenue  = todayOrders.filter(o => o.status !== 'cancelled').reduce((s,o) => s + (o.total||0), 0);
+  const delivCount    = orders.filter(o => o.type === 'delivery').length;
+  const tableCount    = orders.filter(o => o.type === 'table').length;
+
+  const filtered = filter === 'all' ? orders : orders.filter(o => o.status === filter || o.type === filter);
 
   const TABS = [
-    { key: 'dashboard', icon: '📊', label: 'Dashboard'      },
-    { key: 'orders',    icon: '🧾', label: 'Buyurtmalar'    },
-    { key: 'menu',      icon: '🍽️', label: 'Menyu'          },
-    { key: 'staff',     icon: '👥', label: 'Xodimlar'       },
-    { key: 'analytics', icon: '📈', label: 'Analitika'      },
+    { key: 'orders', icon: '🧾', label: 'Buyurtmalar',  count: pendingCount },
+    { key: 'stats',  icon: '📊', label: 'Statistika',   count: null },
+  ];
+
+  const FILTERS = [
+    { key: 'all',       label: 'Barchasi'        },
+    { key: 'new',       label: '🆕 Yangi'         },
+    { key: 'cooking',   label: '👨‍🍳 Tayyorlanmoqda' },
+    { key: 'ready',     label: '📦 Tayyor'        },
+    { key: 'delivery',  label: '🛵 Yetkazib berish'},
+    { key: 'table',     label: '🍽️ Stol bron'     },
+    { key: 'delivered', label: '✅ Yakunlangan'   },
+    { key: 'cancelled', label: '✕ Bekor'          },
   ];
 
   return (
     <div className={styles.admin}>
-      {/* Sidebar */}
+      {/* ── New order notification ── */}
+      {notify && (
+        <div className={styles.notification}>
+          🔔 Yangi buyurtma keldi!
+        </div>
+      )}
+
+      {/* ── Sidebar ── */}
       <aside className={styles.sidebar}>
         <div className={styles.sidebarLogo}>
           <span>✦</span>
           <div>
             <strong>Bella Vista</strong>
-            <span>Admin Panel</span>
+            <span>ADMIN</span>
           </div>
         </div>
+
         <nav className={styles.sideNav}>
           {TABS.map(t => (
             <button
               key={t.key}
               className={`${styles.navItem} ${tab === t.key ? styles.navActive : ''}`}
               onClick={() => setTab(t.key)}
-              id={`admin-tab-${t.key}`}
+              id={`tab-${t.key}`}
             >
               <span className={styles.navIcon}>{t.icon}</span>
-              <span>{t.label}</span>
+              <span className={styles.navLabel}>{t.label}</span>
+              {t.count > 0 && <span className={styles.navBadge}>{t.count}</span>}
             </button>
           ))}
         </nav>
+
         <div className={styles.sideBottom}>
-          <a href="/delivery" className={styles.sideLink}>🛵 Yetkazib berish</a>
-          <a href="/" className={styles.sideLink}>🏠 Saytga qaytish</a>
-          <button className={styles.logoutSide} onClick={() => setLoggedIn(false)}>Chiqish</button>
+          <a href="/delivery" className={styles.sideLink}>🛵 Yetkazib berish sahifasi</a>
+          <a href="/"         className={styles.sideLink}>🏠 Asosiy saytga qaytish</a>
+          <button className={styles.logoutSide} onClick={() => setLoggedIn(false)}>⏏ Chiqish</button>
         </div>
       </aside>
 
-      {/* Main */}
+      {/* ── Main ── */}
       <main className={styles.main}>
-        {/* ── DASHBOARD ── */}
-        {tab === 'dashboard' && (
-          <div className={styles.section}>
-            <h1 className={styles.pageTitle}>📊 Dashboard</h1>
-            <div className={styles.statsGrid}>
-              <StatCard icon="💰" label="Bugungi daromad"   value={`$${stats.today}`}     sub="+12% o'tgan haftadan" color="#c9a84c" />
-              <StatCard icon="🆕" label="Yangi buyurtmalar" value={stats.newOrders}        sub="Kutilmoqda"            color="#3b82f6" />
-              <StatCard icon="👨‍🍳" label="Tayyorlanmoqda"   value={stats.cooking}          sub="Oshxonada"            color="#f59e0b" />
-              <StatCard icon="✅" label="Yetkazildi"         value={stats.delivered}        sub="Bugun"                color="#10b981" />
-            </div>
 
-            <div className={styles.dashRow}>
-              <div className={styles.dashCard}>
-                <h3>🔥 So'nggi buyurtmalar</h3>
-                {orders.slice(0, 4).map(o => {
-                  const s = STATUS_CONFIG[o.status];
-                  return (
-                    <div key={o.id} className={styles.recentOrder}>
-                      <div>
-                        <strong>#{o.id}</strong> — {o.customer}
-                        <span className={styles.orderType}>{o.type === 'delivery' ? '🛵' : '🍽️'}</span>
-                      </div>
-                      <div style={{ display:'flex', gap: 12, alignItems: 'center' }}>
-                        <span className={styles.badge} style={{ color: s.color, background: s.bg }}>{s.label}</span>
-                        <span className={styles.orderAmt}>${o.total}</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className={styles.dashCard}>
-                <h3>🏆 Eng ko'p sotilgan</h3>
-                {menuItems.sort((a,b) => b.sold - a.sold).slice(0,5).map(m => (
-                  <div key={m.id} className={styles.topItem}>
-                    <span>{m.name}</span>
-                    <div className={styles.topBar}>
-                      <div className={styles.topFill} style={{ width: `${Math.round(m.sold/210*100)}%` }} />
-                    </div>
-                    <span className={styles.topSold}>{m.sold}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ── ORDERS ── */}
+        {/* ORDERS TAB */}
         {tab === 'orders' && (
           <div className={styles.section}>
-            <h1 className={styles.pageTitle}>🧾 Buyurtmalar</h1>
+            <div className={styles.pageHeader}>
+              <h1 className={styles.pageTitle}>🧾 Buyurtmalar</h1>
+              <button className={styles.refreshBtn} onClick={loadOrders} title="Yangilash">🔄 Yangilash</button>
+            </div>
+
+            {/* Filter pills */}
             <div className={styles.filterRow}>
-              {['all','new','cooking','ready','delivered','cancelled'].map(s => (
-                <button key={s}
-                  className={`${styles.filterBtn} ${filterStatus === s ? styles.filterActive : ''}`}
-                  onClick={() => setFilter(s)} id={`filter-${s}`}>
-                  {s === 'all' ? 'Barchasi' : STATUS_CONFIG[s]?.label}
+              {FILTERS.map(f => (
+                <button
+                  key={f.key}
+                  className={`${styles.filterBtn} ${filter === f.key ? styles.filterActive : ''}`}
+                  onClick={() => setFilter(f.key)}
+                  id={`filter-${f.key}`}
+                >
+                  {f.label}
                   <span className={styles.filterCount}>
-                    {s === 'all' ? orders.length : orders.filter(o => o.status === s).length}
+                    {f.key === 'all' ? orders.length
+                      : f.key === 'delivery' ? orders.filter(o=>o.type==='delivery').length
+                      : f.key === 'table'    ? orders.filter(o=>o.type==='table').length
+                      : orders.filter(o=>o.status===f.key).length}
                   </span>
                 </button>
               ))}
             </div>
 
-            <div className={styles.ordersTable}>
-              <div className={styles.tableHead}>
-                <span>№</span><span>Mijoz</span><span>Buyurtma</span><span>Tur</span><span>Jami</span><span>Holat</span><span>Amal</span>
+            {/* Orders */}
+            {filtered.length === 0 ? (
+              <div className={styles.empty}>
+                <span>📭</span>
+                <p>Hozircha buyurtmalar yo'q</p>
+                <span className={styles.emptyHint}>Mehmonlar buyurtma berganida bu yerda ko'rinadi</span>
               </div>
-              {filteredOrders.map(o => {
-                const s = STATUS_CONFIG[o.status];
+            ) : (
+              <div className={styles.ordersGrid}>
+                {filtered.map(order => (
+                  <OrderCard
+                    key={order.id}
+                    order={order}
+                    isNew={newIds.has(order.id)}
+                    onAdvance={advance}
+                    onCancel={cancel}
+                    onDelete={remove}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* STATS TAB */}
+        {tab === 'stats' && (
+          <div className={styles.section}>
+            <h1 className={styles.pageTitle}>📊 Statistika</h1>
+
+            <div className={styles.statsGrid}>
+              {[
+                { icon:'💰', label:'Bugungi daromad',      value:`$${todayRevenue}`,   color:'#c9a84c' },
+                { icon:'⏳', label:'Kutilayotgan buyurtma', value:pendingCount,          color:'#60a5fa' },
+                { icon:'🛵', label:'Jami yetkazib berish',  value:delivCount,            color:'#34d399' },
+                { icon:'🍽️', label:'Jami stol bron',       value:tableCount,            color:'#fbbf24' },
+                { icon:'📋', label:'Jami buyurtmalar',     value:orders.length,         color:'#a78bfa' },
+                { icon:'✅', label:'Yakunlangan',          value:orders.filter(o=>o.status==='delivered').length, color:'#34d399' },
+              ].map((s, i) => (
+                <div key={i} className={styles.statCard} style={{ '--sc': s.color, animationDelay: `${i*0.08}s` }}>
+                  <span className={styles.statIcon}>{s.icon}</span>
+                  <div>
+                    <div className={styles.statValue}>{s.value}</div>
+                    <div className={styles.statLabel}>{s.label}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Status breakdown */}
+            <div className={styles.breakdown}>
+              <h3>Buyurtmalar holati bo'yicha</h3>
+              {Object.entries(STATUS_CONFIG).map(([key, cfg]) => {
+                const count = orders.filter(o => o.status === key).length;
+                const max   = Math.max(...Object.keys(STATUS_CONFIG).map(k => orders.filter(o=>o.status===k).length), 1);
                 return (
-                  <div key={o.id} className={styles.tableRow} id={`order-row-${o.id}`}>
-                    <span className={styles.orderId}>#{o.id}</span>
-                    <div>
-                      <strong>{o.customer}</strong>
-                      <span className={styles.orderPhone}>{o.phone}</span>
-                      <span className={styles.orderAddr}>📍 {o.address}</span>
+                  <div key={key} className={styles.breakdownRow}>
+                    <span className={styles.breakdownLabel} style={{ color: cfg.color }}>{cfg.label}</span>
+                    <div className={styles.breakdownBar}>
+                      <div className={styles.breakdownFill}
+                        style={{ width: `${(count/max)*100}%`, background: cfg.color }} />
                     </div>
-                    <span className={styles.orderItems}>{o.items}</span>
-                    <span className={styles.orderTypeBadge}>{o.type === 'delivery' ? '🛵 Yetkazish' : '🍽️ Zal'}</span>
-                    <span className={styles.orderTotal}>${o.total}</span>
-                    <span className={styles.badge} style={{ color: s.color, background: s.bg }}>{s.label}</span>
-                    <div className={styles.actionBtns}>
-                      {NEXT_STATUS[o.status] && (
-                        <button className={styles.advBtn} onClick={() => advanceOrder(o.id)} id={`advance-${o.id}`}>
-                          {o.status === 'new' ? '👨‍🍳 Tayyorlash' : o.status === 'cooking' ? '📦 Tayyor' : '✅ Yetkazildi'}
-                        </button>
-                      )}
-                      {['new','cooking'].includes(o.status) && (
-                        <button className={styles.cancelBtn} onClick={() => cancelOrder(o.id)} id={`cancel-${o.id}`}>✕</button>
-                      )}
-                    </div>
+                    <span className={styles.breakdownCount}>{count}</span>
                   </div>
                 );
               })}
-            </div>
-          </div>
-        )}
-
-        {/* ── MENU ── */}
-        {tab === 'menu' && (
-          <div className={styles.section}>
-            <div className={styles.sectionHead}>
-              <h1 className={styles.pageTitle}>🍽️ Menyu boshqaruv</h1>
-              <button className={styles.addItemBtn} id="add-menu-item">+ Yangi taom</button>
-            </div>
-            <div className={styles.menuTable}>
-              <div className={styles.menuHead}>
-                <span>Taom</span><span>Kategoriya</span><span>Narx</span><span>Sotilgan</span><span>Holat</span>
-              </div>
-              {menuItems.map(m => (
-                <div key={m.id} className={styles.menuRow} id={`menu-row-${m.id}`}>
-                  <strong>{m.name}</strong>
-                  <span className={styles.menuCatBadge}>{m.category}</span>
-                  <span className={styles.menuPriceTd}>${m.price}</span>
-                  <span className={styles.menuSold}>{m.sold} ta</span>
-                  <span className={`${styles.menuStatus} ${m.status === 'active' ? styles.statusActive : styles.statusInactive}`}>
-                    {m.status === 'active' ? '✅ Faol' : '⏸ Faol emas'}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ── STAFF ── */}
-        {tab === 'staff' && (
-          <div className={styles.section}>
-            <div className={styles.sectionHead}>
-              <h1 className={styles.pageTitle}>👥 Xodimlar</h1>
-              <button className={styles.addItemBtn} id="add-staff">+ Xodim qo'shish</button>
-            </div>
-            <div className={styles.staffGrid}>
-              {staff.map(s => (
-                <div key={s.id} className={styles.staffCard} id={`staff-${s.id}`}>
-                  <div className={styles.staffAvatar}>
-                    {s.name.split(' ').map(n => n[0]).join('')}
-                  </div>
-                  <div className={styles.staffInfo}>
-                    <strong>{s.name}</strong>
-                    <span className={styles.staffRole}>{s.role}</span>
-                    <span className={styles.staffShift}>🕐 {s.shifts}</span>
-                  </div>
-                  <span className={`${styles.onlineDot} ${s.status === 'online' ? styles.dotOnline : styles.dotOffline}`}>
-                    {s.status === 'online' ? 'Online' : 'Offline'}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ── ANALYTICS ── */}
-        {tab === 'analytics' && (
-          <div className={styles.section}>
-            <h1 className={styles.pageTitle}>📈 Analitika</h1>
-            <div className={styles.analyticsGrid}>
-              {[
-                { label: 'Oy davomida daromad',    value: '$12,480', change: '+18%', up: true  },
-                { label: 'Jami buyurtmalar',        value: '342',     change: '+24%', up: true  },
-                { label: "O'rtacha chek",            value: '$36.5',   change: '+5%',  up: true  },
-                { label: 'Bekor qilingan',          value: '12',      change: '-3%',  up: false },
-                { label: 'Yetkazib berish buyurtma',value: '198',     change: '+31%', up: true  },
-                { label: 'Zal buyurtmalari',        value: '144',     change: '+11%', up: true  },
-              ].map((a, i) => (
-                <div key={i} className={styles.analyticsCard}>
-                  <span className={styles.analyticsLabel}>{a.label}</span>
-                  <span className={styles.analyticsValue}>{a.value}</span>
-                  <span className={`${styles.analyticsChange} ${a.up ? styles.changeUp : styles.changeDown}`}>
-                    {a.up ? '↑' : '↓'} {a.change}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            <div className={styles.chartCard}>
-              <h3>Haftalik sotuv grafigi</h3>
-              <div className={styles.barChart}>
-                {[
-                  { day: 'Du',  val: 65 },
-                  { day: 'Se',  val: 82 },
-                  { day: 'Ch',  val: 74 },
-                  { day: 'Pa',  val: 91 },
-                  { day: 'Ju',  val: 100},
-                  { day: 'Sha', val: 88 },
-                  { day: 'Ya',  val: 70 },
-                ].map((b, i) => (
-                  <div key={i} className={styles.barWrap}>
-                    <div className={styles.barFill} style={{ height: `${b.val}%` }}>
-                      <span className={styles.barVal}>${Math.round(b.val * 18)}</span>
-                    </div>
-                    <span className={styles.barDay}>{b.day}</span>
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
         )}
