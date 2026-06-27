@@ -2,9 +2,208 @@
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { getOrders, updateOrderStatus, deleteOrder, formatTime, formatDate, STATUS_CONFIG } from '../lib/orderStore';
+import { getMenu, addMenuItem, updateMenuItem, deleteMenuItem, toggleAvailable, CATEGORIES, TAGS, IMAGES } from '../lib/menuStore';
 import styles from './page.module.css';
 
 const ADMIN_CODE = 'ADMIN2025';
+
+// ── Empty form template ───────────────────────────────────────────────────
+const EMPTY_FORM = { name: '', category: 'Asosiy taom', price: '', desc: '', img: '/dish1.png', tag: '', time: '20 daq' };
+
+// ── MenuTab ───────────────────────────────────────────────────────────────
+function MenuTab() {
+  const [items,      setItems]      = useState([]);
+  const [showForm,   setShowForm]   = useState(false);
+  const [editId,     setEditId]     = useState(null);
+  const [form,       setForm]       = useState(EMPTY_FORM);
+  const [saved,      setSaved]      = useState(false);
+  const [filterCat,  setFilterCat]  = useState('Barchasi');
+
+  useEffect(() => {
+    setItems(getMenu());
+    const refresh = () => setItems(getMenu());
+    window.addEventListener('bv_menu_updated', refresh);
+    return () => window.removeEventListener('bv_menu_updated', refresh);
+  }, []);
+
+  const openAdd = () => { setForm(EMPTY_FORM); setEditId(null); setShowForm(true); };
+  const openEdit = (item) => {
+    setForm({ name: item.name, category: item.category, price: item.price, desc: item.desc, img: item.img, tag: item.tag||'', time: item.time||'20 daq' });
+    setEditId(item.id);
+    setShowForm(true);
+  };
+  const closeForm = () => { setShowForm(false); setEditId(null); setForm(EMPTY_FORM); };
+
+  const handleSave = (e) => {
+    e.preventDefault();
+    const data = { ...form, price: parseFloat(form.price) || 0, tag: form.tag || null };
+    if (editId) {
+      setItems(updateMenuItem(editId, data));
+    } else {
+      setItems(addMenuItem(data));
+    }
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+    closeForm();
+  };
+
+  const handleDelete = (id) => {
+    if (confirm('Bu taomni o\'chirishni tasdiqlaysizmi?')) {
+      setItems(deleteMenuItem(id));
+    }
+  };
+
+  const handleToggle = (id) => setItems(toggleAvailable(id));
+
+  const cats = ['Barchasi', ...CATEGORIES];
+  const filtered = filterCat === 'Barchasi' ? items : items.filter(i => i.category === filterCat);
+
+  return (
+    <div className={styles.section}>
+      {/* Header */}
+      <div className={styles.pageHeader}>
+        <h1 className={styles.pageTitle}>🍽️ Menyu boshqaruvi</h1>
+        <button className={styles.addBtn} onClick={openAdd} id="add-menu-item">
+          + Yangi taom qo'shish
+        </button>
+      </div>
+
+      {saved && <div className={styles.savedMsg}>✅ Saqlandi!</div>}
+
+      {/* Category filter */}
+      <div className={styles.filterRow}>
+        {cats.map(c => (
+          <button key={c}
+            className={`${styles.filterBtn} ${filterCat === c ? styles.filterActive : ''}`}
+            onClick={() => setFilterCat(c)}>
+            {c}
+            <span className={styles.filterCount}>
+              {c === 'Barchasi' ? items.length : items.filter(i => i.category === c).length}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Add / Edit form modal */}
+      {showForm && (
+        <div className={styles.modalBackdrop} onClick={closeForm}>
+          <div className={styles.menuModal} onClick={e => e.stopPropagation()}>
+            <div className={styles.menuModalHeader}>
+              <h3>{editId ? '✏️ Taomni tahrirlash' : '+ Yangi taom qo\'shish'}</h3>
+              <button onClick={closeForm} className={styles.menuModalClose}>✕</button>
+            </div>
+            <form onSubmit={handleSave} className={styles.menuForm}>
+              <div className={styles.menuFormRow}>
+                <div className={styles.menuField}>
+                  <label>Nomi *</label>
+                  <input required placeholder="Masalan: Caesar Salad"
+                    value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
+                </div>
+                <div className={styles.menuField}>
+                  <label>Narxi ($) *</label>
+                  <input required type="number" min="1" placeholder="24"
+                    value={form.price} onChange={e => setForm({...form, price: e.target.value})} />
+                </div>
+              </div>
+              <div className={styles.menuFormRow}>
+                <div className={styles.menuField}>
+                  <label>Kategoriya</label>
+                  <select value={form.category} onChange={e => setForm({...form, category: e.target.value})}>
+                    {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div className={styles.menuField}>
+                  <label>Tayyorlanish vaqti</label>
+                  <input placeholder="20 daq" value={form.time}
+                    onChange={e => setForm({...form, time: e.target.value})} />
+                </div>
+              </div>
+              <div className={styles.menuField}>
+                <label>Tavsif</label>
+                <textarea rows={3} placeholder="Taom haqida qisqacha..."
+                  value={form.desc} onChange={e => setForm({...form, desc: e.target.value})} />
+              </div>
+              <div className={styles.menuFormRow}>
+                <div className={styles.menuField}>
+                  <label>Belgi (tag)</label>
+                  <select value={form.tag} onChange={e => setForm({...form, tag: e.target.value})}>
+                    {TAGS.map(t => <option key={t} value={t}>{t || '— Belgi yo\'q —'}</option>)}
+                  </select>
+                </div>
+                <div className={styles.menuField}>
+                  <label>Rasm</label>
+                  <select value={form.img} onChange={e => setForm({...form, img: e.target.value})}>
+                    {IMAGES.map(img => <option key={img} value={img}>{img}</option>)}
+                  </select>
+                </div>
+              </div>
+              {/* Image preview */}
+              <div className={styles.imgPreview}>
+                <Image src={form.img} alt="preview" fill style={{ objectFit:'cover', borderRadius:'8px' }} />
+              </div>
+              <div className={styles.menuFormActions}>
+                <button type="button" className={styles.cancelBtn} onClick={closeForm}>Bekor qilish</button>
+                <button type="submit" className={styles.advBtn} id="save-menu-item">
+                  {editId ? '💾 Saqlash' : '+ Qo\'shish'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Menu items grid */}
+      {filtered.length === 0 ? (
+        <div className={styles.empty}>
+          <span>🍽️</span>
+          <p>Hali taomlar yo'q</p>
+          <span className={styles.emptyHint}>Yuqoridagi "Yangi taom qo'shish" tugmasini bosing</span>
+        </div>
+      ) : (
+        <div className={styles.menuGrid}>
+          {filtered.map((item, idx) => (
+            <div key={item.id} className={`${styles.menuItemCard} ${!item.available ? styles.unavailable : ''}`}
+              style={{ animationDelay: `${idx * 0.05}s` }} id={`menu-item-${item.id}`}>
+              <div className={styles.menuItemImg}>
+                <Image src={item.img} alt={item.name} fill style={{ objectFit:'cover' }} />
+                {item.tag && <span className={styles.menuTag}>{item.tag}</span>}
+                <button
+                  className={`${styles.availBtn} ${item.available ? styles.availOn : styles.availOff}`}
+                  onClick={() => handleToggle(item.id)}
+                  title={item.available ? 'Mavjud — o\'chirish uchun bosing' : 'Mavjud emas — yoqish uchun bosing'}
+                >
+                  {item.available ? '✅' : '❌'}
+                </button>
+              </div>
+              <div className={styles.menuItemBody}>
+                <div className={styles.menuItemTop}>
+                  <span className={styles.menuItemCat}>{item.category}</span>
+                  <span className={styles.menuItemPrice}>${item.price}</span>
+                </div>
+                <h4 className={styles.menuItemName}>{item.name}</h4>
+                <p className={styles.menuItemDesc}>{item.desc}</p>
+                <div className={styles.menuItemMeta}>
+                  <span>⏱ {item.time}</span>
+                  <span className={item.available ? styles.available : styles.notAvailable}>
+                    {item.available ? 'Mavjud' : 'Mavjud emas'}
+                  </span>
+                </div>
+                <div className={styles.menuItemActions}>
+                  <button className={styles.editBtn} onClick={() => openEdit(item)} id={`edit-${item.id}`}>
+                    ✏️ Tahrirlash
+                  </button>
+                  <button className={styles.deleteBtn} onClick={() => handleDelete(item.id)} id={`delete-menu-${item.id}`}>
+                    🗑 O'chirish
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ── Login ──────────────────────────────────────────────────────────────────
 function Login({ onLogin }) {
@@ -197,8 +396,9 @@ export default function AdminPage() {
   const filtered = filter === 'all' ? orders : orders.filter(o => o.status === filter || o.type === filter);
 
   const TABS = [
-    { key: 'orders', icon: '🧾', label: 'Buyurtmalar',  count: pendingCount },
-    { key: 'stats',  icon: '📊', label: 'Statistika',   count: null },
+    { key: 'orders', icon: '🧾', label: 'Buyurtmalar', count: pendingCount },
+    { key: 'menu',   icon: '🍽️', label: 'Menyu',       count: null },
+    { key: 'stats',  icon: '📊', label: 'Statistika',  count: null },
   ];
 
   const FILTERS = [
@@ -308,6 +508,9 @@ export default function AdminPage() {
             )}
           </div>
         )}
+
+        {/* MENU TAB */}
+        {tab === 'menu' && <MenuTab />}
 
         {/* STATS TAB */}
         {tab === 'stats' && (
