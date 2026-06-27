@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useLang } from '../context/LanguageContext';
 import styles from './Navbar.module.css';
 
@@ -48,7 +49,14 @@ export default function Navbar({ onLogout }) {
     <nav className={`${styles.navbar} ${scrolled ? styles.scrolled : ''}`}>
       <div className={styles.inner}>
         <a href="#home" className={styles.logo}>
-          <span className={styles.logoIcon}>✦</span>
+          <Image
+            src="/logo.png"
+            alt="Bella Vista Restaurant"
+            width={44}
+            height={44}
+            className={styles.logoImg}
+            style={{ borderRadius: '50%', objectFit: 'cover' }}
+          />
           <div>
             <span className={styles.logoMain}>Bella Vista</span>
             <span className={styles.logoSub}>Fine Dining</span>

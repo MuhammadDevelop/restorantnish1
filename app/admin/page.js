@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { getOrders, updateOrderStatus, deleteOrder, formatTime, formatDate, STATUS_CONFIG } from '../lib/orderStore';
 import styles from './page.module.css';
 
@@ -25,7 +26,8 @@ function Login({ onLogin }) {
       <div className={styles.glow} />
       <div className={`${styles.loginCard} ${shake ? styles.shake : ''}`}>
         <div className={styles.loginLogo}>
-          <span className={styles.loginStar}>✦</span>
+          <Image src="/logo.png" alt="Bella Vista" width={80} height={80}
+            style={{ borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(201,168,76,0.3)', boxShadow: '0 8px 32px rgba(201,168,76,0.2)' }} />
           <div>
             <strong>Bella Vista</strong>
             <span>ADMIN PANEL</span>
@@ -222,7 +224,8 @@ export default function AdminPage() {
       {/* ── Sidebar ── */}
       <aside className={styles.sidebar}>
         <div className={styles.sidebarLogo}>
-          <span>✦</span>
+          <Image src="/logo.png" alt="Bella Vista" width={40} height={40}
+            style={{ borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
           <div>
             <strong>Bella Vista</strong>
             <span>ADMIN</span>

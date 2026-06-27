@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Menu from './components/Menu';
@@ -39,7 +40,8 @@ export default function Home() {
       <div className={styles.loginWrap}>
         {/* Logo */}
         <div className={styles.logo}>
-          <span className={styles.logoIcon}>✦</span>
+          <Image src="/logo.png" alt="Bella Vista" width={90} height={90}
+            style={{ borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(201,168,76,0.3)', boxShadow: '0 8px 32px rgba(201,168,76,0.15)' }} />
           <div>
             <strong>Bella Vista</strong>
             <span>FINE DINING</span>

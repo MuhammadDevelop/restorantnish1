@@ -37,6 +37,13 @@
   animation: float 3s ease-in-out infinite;
 }
 
+.logoImg {
+  transition: transform 0.3s ease;
+}
+.logo:hover .logoImg {
+  transform: scale(1.08) rotate(3deg);
+}
+
 .logoMain {
   display: block;
   font-family: 'Playfair Display', serif;
