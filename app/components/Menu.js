@@ -90,7 +90,7 @@ export default function Menu() {
           {categories.map((c, i) => (
             <button
               key={i}
-              className={`${styles.catBtn} ${activeCategory === c.key ? styles.active : ''}`}
+              className={`${styles.catBtn} ${activeCategory === c.key ? styles.catActive : ''}`}
               id={`menu-cat-${c.key.toLowerCase().replace(' ', '-')}`}
               onClick={() => setActiveCategory(c.key)}
             >
@@ -100,25 +100,31 @@ export default function Menu() {
         </div>
 
         <div className={styles.grid}>
-          {filtered.map(dish => (
-            <div className={styles.card} key={dish.id} id={`dish-${dish.id}`}>
+          {filtered.map((dish, idx) => (
+            <div className={styles.card} key={dish.id} id={`dish-${dish.id}`}
+              style={{ animationDelay: `${idx * 0.08}s` }}
+              onClick={() => setSelectedDish(dish)}>
               <div className={styles.imgWrap}>
-                <Image src={dish.img} alt={dish.name_key} width={400} height={280}
-                  style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+                <Image src={dish.img} alt={dish.name_key} fill
+                  style={{ objectFit: 'cover' }} />
                 {dish.tag && <span className={styles.tag}>{dish.tag}</span>}
-                <div className={styles.imgOverlay} />
-              </div>
-              <div className={styles.cardBody}>
-                <div className={styles.cardMeta}>
-                  <span className={styles.cardCat}>{dish.category}</span>
-                  <span className={styles.cardPrice}>{dish.price}</span>
-                </div>
-                <h3 className={styles.cardName}>{dish.name_key}</h3>
-                <p className={styles.cardDesc}>{dish.desc_key}</p>
-                <button className={styles.orderBtn} id={`order-${dish.id}`}
-                  onClick={() => setSelectedDish(dish)}>
-                  {t('menu_order')}
+                <div className={styles.overlay} />
+                <button className={styles.quickView} id={`quick-${dish.id}`}
+                  onClick={e => { e.stopPropagation(); setSelectedDish(dish); }}>
+                  {t('nav_home') === 'Home' ? 'Quick View' : t('nav_home') === 'Bosh sahifa' ? 'Ko\'rish' : 'Просмотр'} →
                 </button>
+              </div>
+              <div className={styles.body}>
+                <span className={styles.category}>{dish.category}</span>
+                <h3 className={styles.name}>{dish.name_key}</h3>
+                <p className={styles.cardDesc}>{dish.desc_key}</p>
+                <div className={styles.footer}>
+                  <span className={styles.price}>{dish.price}</span>
+                  <button className={styles.orderBtn} id={`order-${dish.id}`}
+                    onClick={e => { e.stopPropagation(); setSelectedDish(dish); }}>
+                    {t('menu_order')}
+                  </button>
+                </div>
               </div>
             </div>
           ))}

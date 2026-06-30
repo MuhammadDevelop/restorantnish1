@@ -16,6 +16,7 @@ export default function Navbar({ onLogout }) {
   const [menuOpen,  setMenuOpen]  = useState(false);
   const [langOpen,  setLangOpen]  = useState(false);
   const [userName,  setUserName]  = useState('');
+  const [theme,     setTheme]     = useState('dark');
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -27,8 +28,20 @@ export default function Navbar({ onLogout }) {
       try { setUserName(JSON.parse(saved).name.split(' ')[0]); } catch {}
     }
 
+    // Load saved theme
+    const savedTheme = localStorage.getItem('bv_theme') || 'dark';
+    setTheme(savedTheme);
+    document.documentElement.setAttribute('data-theme', savedTheme);
+
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('bv_theme', next);
+  };
 
   const links = [
     { href: '#home',    label: t('nav_home')    },
@@ -112,6 +125,17 @@ export default function Navbar({ onLogout }) {
               </div>
             )}
           </div>
+
+          {/* Theme toggle */}
+          <button
+            className={styles.themeBtn}
+            onClick={toggleTheme}
+            id="theme-toggle"
+            title={theme === 'dark' ? 'Kun rejimi' : 'Tun rejimi'}
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
 
           {/* User + logout */}
           {userName && (
