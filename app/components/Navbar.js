@@ -22,10 +22,20 @@ export default function Navbar({ onLogout }) {
     const onScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener('scroll', onScroll);
 
-    // Get logged-in user name
+    // Get logged-in user name — skip if it looks like admin code
     const saved = localStorage.getItem('bv_user');
     if (saved) {
-      try { setUserName(JSON.parse(saved).name.split(' ')[0]); } catch {}
+      try {
+        const parsed = JSON.parse(saved);
+        const name = parsed.name || '';
+        // Don't show if it's an admin code (all caps + digits pattern)
+        if (!/^[A-Z0-9]+$/.test(name.trim())) {
+          setUserName(name.split(' ')[0]);
+        } else {
+          // Clear bad entry
+          localStorage.removeItem('bv_user');
+        }
+      } catch {}
     }
 
     // Load saved theme

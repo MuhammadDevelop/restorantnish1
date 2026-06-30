@@ -1,5 +1,5 @@
 .footer {
-  background: var(--dark-2);
+  background: #0f1219 !important;
   border-top: 1px solid rgba(201, 168, 76, 0.1);
 }
 
@@ -33,7 +33,7 @@
   font-family: 'Playfair Display', serif;
   font-size: 20px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: #f5f0e8 !important;
   line-height: 1;
 }
 
@@ -49,7 +49,7 @@
 
 .tagline {
   font-size: 13px;
-  color: var(--text-muted);
+  color: rgba(255,255,255,0.55) !important;
   line-height: 1.8;
   margin-bottom: 24px;
   max-width: 260px;

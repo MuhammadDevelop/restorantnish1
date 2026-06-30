@@ -55,7 +55,7 @@
   font-size: clamp(2.8rem, 7vw, 5.5rem);
   font-weight: 700;
   line-height: 1.1;
-  color: var(--text-primary);
+  color: #f5f0e8 !important;
   margin-bottom: 24px;
   animation: fadeInUp 0.8s 0.1s ease both;
 }
@@ -70,7 +70,7 @@
 
 .subtitle {
   font-size: 17px;
-  color: var(--text-secondary);
+  color: rgba(255,255,255,0.82) !important;
   line-height: 1.8;
   margin-bottom: 40px;
   max-width: 500px;
@@ -133,7 +133,7 @@
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 1px;
-  color: var(--text-muted);
+  color: rgba(255,255,255,0.65) !important;
   text-transform: uppercase;
 }
 
