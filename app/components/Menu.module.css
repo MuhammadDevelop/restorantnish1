@@ -202,7 +202,7 @@
 
 .cardDesc {
   font-size: 13px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   line-height: 1.65;
   flex: 1;
 }

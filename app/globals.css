@@ -19,11 +19,11 @@
   --dark-4: #1a1f2e;
   --dark-5: #1e2438;
 
-  /* Text */
-  --text-primary:   #f5f0e8;
-  --text-secondary: #b0a090;
-  --text-muted:     #6b6060;
-  --text-faint:     #3a3a4a;
+  /* Text — dark mode (all clearly visible on dark bg) */
+  --text-primary:   #f5f0e8;  /* bright cream */
+  --text-secondary: #c8bfb0;  /* warm light grey */
+  --text-muted:     #9e9080;  /* medium — clearly visible */
+  --text-faint:     #7a7080;  /* subtle but still readable */
 
   /* Borders */
   --border:       rgba(255,255,255,0.07);
@@ -66,23 +66,27 @@ body {
 /* ── LIGHT MODE ─────────────────────────────────────── */
 [data-theme="light"] {
   --dark:   #faf8f4;
-  --dark-2: #f2ede4;
-  --dark-3: #ede8de;
-  --dark-4: #e5dfd2;
-  --dark-5: #ddd6c8;
+  --dark-2: #f0ebe0;
+  --dark-3: #e8e2d6;
+  --dark-4: #ddd7c8;
+  --dark-5: #d4cdb8;
 
   --text-primary:   #1a1208;
-  --text-secondary: #4a3f2f;
-  --text-muted:     #7a6e5a;
-  --text-faint:     #a09484;
+  --text-secondary: #3a3020;
+  --text-muted:     #6a5e48;
+  --text-faint:     #8a7e6a;
 
-  --border:       rgba(0,0,0,0.08);
-  --border-gold:  rgba(160,120,48,0.25);
-  --border-gold2: rgba(160,120,48,0.45);
+  --gold:       #9a6c10;
+  --gold-light: #b8860b;
+  --gold-dark:  #7a5208;
 
-  --shadow-sm: 0 4px 20px rgba(0,0,0,0.08);
-  --shadow-md: 0 12px 40px rgba(0,0,0,0.12);
-  --shadow-lg: 0 40px 100px rgba(0,0,0,0.18);
+  --border:       rgba(0,0,0,0.1);
+  --border-gold:  rgba(154,108,16,0.3);
+  --border-gold2: rgba(154,108,16,0.5);
+
+  --shadow-sm: 0 4px 20px rgba(0,0,0,0.07);
+  --shadow-md: 0 12px 40px rgba(0,0,0,0.11);
+  --shadow-lg: 0 40px 100px rgba(0,0,0,0.16);
 }
 
 [data-theme="light"] body {
