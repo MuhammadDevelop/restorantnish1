@@ -10,7 +10,13 @@ import Reservation from './components/Reservation';
 import Footer from './components/Footer';
 import styles from './login.module.css';
 
-const ADMIN_CODE = 'ADMIN2025';
+// ── Role codes ───────────────────────────────────
+const STAFF_ROLES = [
+  { code: 'ADMIN2025',  label: 'Administrator', route: '/admin',  icon: '👨‍💼', color: '#c9a84c' },
+  { code: 'KASSIR2025', label: 'Kassir',         route: '/kassir', icon: '💰',  color: '#3b82f6' },
+  { code: 'OSHPAZ2025', label: 'Oshpaz',         route: '/oshpaz', icon: '👨‍🍳', color: '#10b981' },
+  { code: 'BOSS2025',   label: 'Boss',            route: '/boss',   icon: '👑',  color: '#a855f7' },
+];
 
 // ── Helpers ──────────────────────────────────────
 function getUsers() {
@@ -24,7 +30,7 @@ function saveUsers(users) {
 export default function Home() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [loading,  setLoading]  = useState(true);
-  const [mode,     setMode]     = useState('login'); // login | register | admin
+  const [mode,     setMode]     = useState('login'); // login | register | staff
   const [error,    setError]    = useState('');
   const [success,  setSuccess]  = useState('');
 
@@ -32,8 +38,8 @@ export default function Home() {
   const [loginForm, setLoginForm] = useState({ phone: '', password: '' });
   // Register form
   const [regForm,   setRegForm]   = useState({ name: '', phone: '', password: '', confirm: '' });
-  // Admin form
-  const [adminCode, setAdminCode] = useState('');
+  // Staff (all roles) form
+  const [staffCode, setStaffCode] = useState('');
 
   useEffect(() => {
     const saved = localStorage.getItem('bv_user');
@@ -58,7 +64,7 @@ export default function Home() {
     const users = getUsers();
     const user  = users.find(u => u.phone === loginForm.phone.trim() && u.password === loginForm.password);
     if (!user) {
-      setError('Telefon raqam yoki parol noto\'g\'ri.');
+      setError("Telefon raqam yoki parol noto'g'ri.");
       return;
     }
     localStorage.setItem('bv_user', JSON.stringify({ name: user.name, phone: user.phone }));
@@ -70,37 +76,38 @@ export default function Home() {
     e.preventDefault();
     setError(''); setSuccess('');
     if (!regForm.name.trim() || !regForm.phone.trim() || !regForm.password) {
-      setError('Barcha maydonlarni to\'ldiring.');
+      setError("Barcha maydonlarni to'ldiring.");
       return;
     }
     if (regForm.password.length < 4) {
-      setError('Parol kamida 4 ta belgidan iborat bo\'lishi kerak.');
+      setError("Parol kamida 4 ta belgidan iborat bo'lishi kerak.");
       return;
     }
     if (regForm.password !== regForm.confirm) {
-      setError('Parollar mos kelmaydi.');
+      setError("Parollar mos kelmaydi.");
       return;
     }
     const users = getUsers();
     if (users.find(u => u.phone === regForm.phone.trim())) {
-      setError('Bu telefon raqam allaqachon ro\'yxatdan o\'tgan.');
+      setError("Bu telefon raqam allaqachon ro'yxatdan o'tgan.");
       return;
     }
     const newUser = { name: regForm.name.trim(), phone: regForm.phone.trim(), password: regForm.password, createdAt: new Date().toISOString() };
     saveUsers([...users, newUser]);
-    setSuccess('✅ Ro\'yxatdan o\'tdingiz! Endi kirish mumkin.');
+    setSuccess("✅ Ro'yxatdan o'tdingiz! Endi kirish mumkin.");
     setRegForm({ name: '', phone: '', password: '', confirm: '' });
     setTimeout(() => { setMode('login'); setSuccess(''); }, 1800);
   };
 
-  // ── Admin submit ──────────────────────────────
-  const handleAdmin = (e) => {
+  // ── Staff submit ──────────────────────────────
+  const handleStaff = (e) => {
     e.preventDefault();
     setError('');
-    if (adminCode.trim() === ADMIN_CODE) {
-      window.location.href = '/admin';
+    const role = STAFF_ROLES.find(r => r.code === staffCode.trim());
+    if (role) {
+      window.location.href = role.route;
     } else {
-      setError('Noto\'g\'ri kod. Qayta urinib ko\'ring.');
+      setError("Noto'g'ri kod. Qayta urinib ko'ring.");
     }
   };
 
@@ -128,8 +135,8 @@ export default function Home() {
           <button className={`${styles.tab} ${mode === 'register' ? styles.tabActive : ''}`} onClick={() => { setMode('register'); setError(''); setSuccess(''); }} id="tab-register">
             📝 Ro'yxat
           </button>
-          <button className={`${styles.tab} ${mode === 'admin'    ? styles.tabActive : ''}`} onClick={() => { setMode('admin');    setError(''); setSuccess(''); }} id="tab-admin">
-            ⚙️ Admin
+          <button className={`${styles.tab} ${mode === 'staff'    ? styles.tabActive : ''}`} onClick={() => { setMode('staff');    setError(''); setSuccess(''); }} id="tab-staff">
+            🏢 Xodimlar
           </button>
         </div>
 
@@ -221,24 +228,40 @@ export default function Home() {
             </>
           )}
 
-          {/* ── ADMIN ── */}
-          {mode === 'admin' && (
+          {/* ── STAFF ── */}
+          {mode === 'staff' && (
             <>
               <div className={styles.cardTop}>
-                <h1>Admin Panel</h1>
-                <p>Faqat vakolatli xodimlar uchun</p>
+                <h1>🏢 Xodimlar kirishi</h1>
+                <p>Roluingizga mos maxsus kodni kiriting</p>
               </div>
-              <form className={styles.form} onSubmit={handleAdmin}>
+
+              {/* Role cards */}
+              <div className={styles.roleGrid}>
+                {STAFF_ROLES.map(r => (
+                  <button key={r.code} type="button"
+                    className={styles.roleCard}
+                    style={{ '--rc': r.color }}
+                    onClick={() => { setStaffCode(r.code); setError(''); }}
+                    id={`role-${r.label.toLowerCase()}`}
+                  >
+                    <span className={styles.roleIcon}>{r.icon}</span>
+                    <span className={styles.roleLabel}>{r.label}</span>
+                  </button>
+                ))}
+              </div>
+
+              <form className={styles.form} onSubmit={handleStaff} style={{ marginTop: 0 }}>
                 <div className={styles.field}>
                   <label>Maxsus kirish kodi</label>
-                  <input id="admin-code" type="password" placeholder="••••••••••"
-                    value={adminCode}
-                    onChange={e => { setAdminCode(e.target.value); setError(''); }}
+                  <input id="staff-code" type="password" placeholder="••••••••••"
+                    value={staffCode}
+                    onChange={e => { setStaffCode(e.target.value); setError(''); }}
                     required />
                 </div>
                 {error && <p className={styles.error}>{error}</p>}
-                <button type="submit" className={styles.submitBtn} id="admin-submit">
-                  Admin sifatida kirish →
+                <button type="submit" className={styles.submitBtn} id="staff-submit">
+                  Kirish →
                 </button>
               </form>
             </>
@@ -250,7 +273,6 @@ export default function Home() {
     </div>
   );
 
-  // ── Logged in — show main site ─────────────────
   return (
     <>
       <Navbar onLogout={() => { localStorage.removeItem('bv_user'); setLoggedIn(false); }} />

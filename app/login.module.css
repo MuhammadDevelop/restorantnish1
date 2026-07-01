@@ -271,3 +271,38 @@
   text-underline-offset: 3px;
 }
 .switchLink:hover { color: var(--gold-light); }
+
+/* ── Role grid (staff tab) ── */
+.roleGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 0 24px 16px;
+}
+
+.roleCard {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 16px 12px;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  border-left: 3px solid var(--rc, var(--gold));
+}
+.roleCard:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: var(--rc, var(--gold));
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.roleIcon  { font-size: 26px; }
+.roleLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+}
