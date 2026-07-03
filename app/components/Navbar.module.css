@@ -193,37 +193,31 @@
 }
 
 @media (max-width: 768px) {
-  .burger {
-    display: flex;
-  }
+  .burger { display: flex; }
 
   .links {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(13, 13, 13, 0.98);
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(9, 11, 18, 0.98);
+    backdrop-filter: blur(12px);
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 40px;
-    z-index: -1;
+    gap: 36px;
+    z-index: 999;
   }
+  .links.open { display: flex; }
 
-  .links.open {
-    display: flex;
-  }
+  .link { font-size: 22px; color: #f5f0e8 !important; }
+  .reserveBtn { font-size: 14px; padding: 14px 28px; }
+  .deliveryBtn { display: none; }
+}
 
-  .link {
-    font-size: 20px;
-  }
-
-  .reserveBtn {
-    font-size: 14px;
-    padding: 16px 32px;
-  }
+@media (max-width: 480px) {
+  .userName { display: none; }
+  .langCurrent span:first-child { display: none; }
+  .right { gap: 8px; }
 }
 
 /* ── Right side (lang + burger) ── */
