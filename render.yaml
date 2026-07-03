@@ -1,13 +1,12 @@
 services:
+  # ─── Frontend: Next.js ────────────────────────────────────────
   - type: web
     name: bella-vista-restaurant
     env: node
     region: frankfurt
     plan: free
     buildCommand: npm install && npm run build
-    startCommand: npm start
+    startCommand: npx next start -p $PORT
     envVars:
       - key: NODE_VERSION
         value: 20
-      - key: PORT
-        value: 3000
