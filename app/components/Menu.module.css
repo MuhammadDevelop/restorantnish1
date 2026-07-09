@@ -394,8 +394,29 @@
 
 /* ── Responsive ── */
 @media (max-width: 1024px) { .grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 640px)  {
+
+@media (max-width: 640px) {
   .grid { grid-template-columns: 1fr; }
   .menu { padding: 80px 0; }
   .imgWrap { height: 200px; }
+  .categories { gap: 6px; }
+  .catBtn { font-size: 11px; padding: 9px 16px; }
+  .header { margin-bottom: 36px; }
+  .desc { font-size: 14px; }
+}
+
+@media (max-width: 480px) {
+  .menu { padding: 60px 0; }
+  .grid { gap: 16px; }
+  .body { padding: 16px; }
+  .name { font-size: 17px; }
+  .price { font-size: 20px; }
+  .modal { border-radius: 16px; }
+  .modalBody { padding: 20px; }
+  .modalName { font-size: 20px; }
+  .modalImg { height: 200px; }
+  .modalFooter { flex-direction: column; align-items: stretch; }
+  .modalActions { flex-direction: column; }
+  .modalBtn, .modalBtnGreen { width: 100%; justify-content: center; }
+  .modalPrice { font-size: 24px; }
 }

@@ -233,8 +233,19 @@
 }
 
 @media (max-width: 480px) {
-  .form    { padding: 24px; }
-  .cardTop { padding: 22px 24px 18px; }
+  .form    { padding: 20px 16px; }
+  .cardTop { padding: 20px 16px 16px; }
+  .loginWrap { gap: 16px; }
+  .tabs { flex-wrap: wrap; }
+  .tab { font-size: 12px; padding: 8px 10px; }
+  .card { border-radius: 12px; }
+  .loginPage { padding: 16px; }
+  .logo strong { font-size: 18px; }
+  .logo span { font-size: 8px; }
+  .roleGrid { padding: 0 12px 12px; gap: 8px; }
+  .roleCard { padding: 12px 8px; }
+  .roleIcon { font-size: 22px; }
+  .roleLabel { font-size: 11px; }
 }
 
 /* ── Success message ── */

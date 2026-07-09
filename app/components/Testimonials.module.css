@@ -113,3 +113,11 @@
     padding: 80px 0;
   }
 }
+
+@media (max-width: 640px) {
+  .grid { grid-template-columns: 1fr; max-width: 100%; }
+  .card { padding: 24px 20px; }
+  .section { padding: 60px 0; }
+  .header { margin-bottom: 40px; }
+  .text { font-size: 13px; }
+}

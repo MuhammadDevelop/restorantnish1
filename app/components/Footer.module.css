@@ -215,6 +215,7 @@
 @media (max-width: 640px) {
   .grid {
     grid-template-columns: 1fr;
+    gap: 32px;
   }
   .brand {
     grid-column: auto;
@@ -227,4 +228,19 @@
   .top {
     padding: 60px 0 40px;
   }
+  .newsletterForm {
+    flex-direction: column;
+  }
+  .newsletterForm input {
+    border-radius: 2px;
+    padding: 14px 16px;
+  }
+  .newsletterForm button {
+    padding: 14px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  .bottomLinks { gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .tagline { max-width: 100%; }
 }

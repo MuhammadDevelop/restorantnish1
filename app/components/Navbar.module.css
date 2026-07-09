@@ -212,12 +212,17 @@
   .link { font-size: 22px; color: #f5f0e8 !important; }
   .reserveBtn { font-size: 14px; padding: 14px 28px; }
   .deliveryBtn { display: none; }
+  .dashBtn { display: none; }
 }
 
 @media (max-width: 480px) {
+  .inner { padding: 0 16px; }
   .userName { display: none; }
   .langCurrent span:first-child { display: none; }
-  .right { gap: 8px; }
+  .right { gap: 6px; }
+  .themeBtn { width: 34px; height: 34px; font-size: 15px; }
+  .logoMain { font-size: 18px; }
+  .logoSub { font-size: 8px; letter-spacing: 2px; }
 }
 
 /* ── Right side (lang + burger) ── */
